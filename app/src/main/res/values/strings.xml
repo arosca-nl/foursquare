@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Foursquare</string>
+    <string name="city">City</string>
+    <string name="venue_name_location">%s\n%s</string>
+    <string name="venue_name_category_location">%s\n%s\n%s</string>
+</resources>
