@@ -13,7 +13,7 @@ class FoursquareUserlessInterceptor : Interceptor {
             .newBuilder()
             .addEncodedQueryParameter("client_id", BuildConfig.CLIENT_ID)
             .addEncodedQueryParameter("client_secret", BuildConfig.CLIENT_SECRET)
-                // freezes API version, date YYYMMDD
+            // freezes API version, date YYYMMDD
             .addEncodedQueryParameter("v", "20200807")
             .build()
 

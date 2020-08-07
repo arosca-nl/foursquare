@@ -8,7 +8,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-class VenueSearchViewModel @ViewModelInject constructor(private val venueRepository: VenueRepository) : ViewModel() {
+class VenueSearchViewModel @ViewModelInject constructor(private val venueRepository: VenueRepository) :
+    ViewModel() {
 
     private val mutableVenues = MutableLiveData<VenuesResult>()
     private var searchJob: Job? = null

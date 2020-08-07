@@ -10,4 +10,8 @@ class VenueRepository @Inject constructor(private val venueApi: VenueApi) {
     suspend fun search(near: String) = withContext(Dispatchers.IO) {
         venueApi.search(near).venues
     }
+
+    suspend fun detail(venueId: String) = withContext(Dispatchers.IO) {
+        venueApi.detail(venueId).detail
+    }
 }

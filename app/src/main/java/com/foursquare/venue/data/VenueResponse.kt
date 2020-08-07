@@ -9,3 +9,11 @@ data class VenueListMetaResponse(val response: VenueListResponse) {
 
 @JsonClass(generateAdapter = true)
 data class VenueListResponse(val venues: List<Venue>)
+
+@JsonClass(generateAdapter = true)
+data class VenueDetailMetaResponse(val response: VenueDetailResponse) {
+    val detail = response.venue
+}
+
+@JsonClass(generateAdapter = true)
+data class VenueDetailResponse(val venue: VenueDetail)
