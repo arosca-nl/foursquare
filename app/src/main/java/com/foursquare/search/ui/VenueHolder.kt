@@ -15,14 +15,14 @@ class VenueHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             context.getString(
                 R.string.venue_name_location,
                 venue.name,
-                venue.location.address
+                venue.location.formattedAddress
             )
         else
             context.getString(
                 R.string.venue_name_category_location,
                 venue.name,
                 venue.categoryName,
-                venue.location.address
+                venue.location.formattedAddress
             )
     }
 

@@ -7,9 +7,9 @@ import okhttp3.Request
 import okhttp3.Response
 
 
-class FoursquareUserlessInterceptor : Interceptor {
+class FoursquareInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        val url: HttpUrl = chain.request().url
+        val url: HttpUrl = chain.request().url()
             .newBuilder()
             .addEncodedQueryParameter("client_id", BuildConfig.CLIENT_ID)
             .addEncodedQueryParameter("client_secret", BuildConfig.CLIENT_SECRET)

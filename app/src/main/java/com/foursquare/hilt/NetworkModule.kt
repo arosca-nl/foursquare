@@ -1,6 +1,6 @@
 package com.foursquare.hilt
 
-import com.foursquare.venue.api.FoursquareUserlessInterceptor
+import com.foursquare.venue.api.FoursquareInterceptor
 import com.foursquare.venue.api.VenueApi
 import dagger.Module
 import dagger.Provides
@@ -16,7 +16,7 @@ object NetworkModule {
 
     @Provides
     fun provideOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
-        .addInterceptor(FoursquareUserlessInterceptor())
+        .addInterceptor(FoursquareInterceptor())
         .build()
 
     @Provides

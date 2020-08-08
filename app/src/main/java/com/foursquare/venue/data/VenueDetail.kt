@@ -4,6 +4,7 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class VenueDetail(
+    val id: String,
     val name: String,
     val description: String?,
     val rating: Float?,
