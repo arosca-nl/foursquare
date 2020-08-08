@@ -8,6 +8,7 @@ data class Location(
     val postalCode: String?,
     val city: String?
 ) {
+
     val formattedAddress by lazy {
         listOf(address, postalCode, city)
             .filter { !it.isNullOrEmpty() }

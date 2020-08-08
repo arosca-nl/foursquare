@@ -10,6 +10,10 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.foursquare.R
+import com.foursquare.lifecycle.ContentEvent
+import com.foursquare.lifecycle.ErrorEvent
+import com.foursquare.lifecycle.LoadingEvent
+import com.foursquare.lifecycle.eventContent
 import com.foursquare.venue.data.Venue
 import com.foursquare.venue.data.VenueDetail
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,20 +49,30 @@ class VenueDetailDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.detail.observe(viewLifecycleOwner, Observer {
-            contentLoadingProgressBar.hide()
-            if (it.isSuccess)
-                setupView(it.getOrThrow())
-            else
-                Toast.makeText(context, it.exceptionOrNull()?.message, Toast.LENGTH_SHORT).show()
-        })
-
+        setupLiveDataObserver()
         arguments?.getString(VENUE_ID)?.let {
-            contentLoadingProgressBar.show()
             viewModel.loadDetails(it)
         }
 
         toolbar.setNavigationOnClickListener { dismiss() }
+    }
+
+    private fun setupLiveDataObserver() {
+        viewModel.state.observe(viewLifecycleOwner, Observer { event ->
+            when (event) {
+                LoadingEvent -> contentLoadingProgressBar.show()
+                is ContentEvent<*> -> {
+                    contentLoadingProgressBar.hide()
+                    setupView(eventContent(event))
+                }
+                is ErrorEvent -> {
+                    contentLoadingProgressBar.hide()
+                    event.throwable?.let {
+                        Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        })
     }
 
     private fun setupView(venueDetail: VenueDetail) {

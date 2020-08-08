@@ -10,10 +10,15 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.foursquare.R
 import com.foursquare.detail.VenueDetailDialogFragment
+import com.foursquare.lifecycle.ContentEvent
+import com.foursquare.lifecycle.ErrorEvent
+import com.foursquare.lifecycle.LoadingEvent
+import com.foursquare.lifecycle.eventContent
 import com.foursquare.search.ui.VenueAdapter
 import com.foursquare.venue.data.Venue
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_venue_search.*
+
 
 @AndroidEntryPoint
 class VenueSearchActivity : AppCompatActivity() {
@@ -32,7 +37,7 @@ class VenueSearchActivity : AppCompatActivity() {
         searchView.onActionViewExpanded()
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                contentLoadingProgressBar.show()
+                searchView.clearFocus()
                 viewModel.search(query)
                 return false
             }
@@ -47,19 +52,27 @@ class VenueSearchActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(context)
             addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
             adapter = VenueAdapter(layoutInflater).apply {
-                setupVenueAdapter(this)
+                setupLiveDataObserver(this)
             }
         }
     }
 
-    private fun setupVenueAdapter(adapter: VenueAdapter) {
-        // data in from network
-        viewModel.venues.observe(this, Observer<VenuesResult> {
-            contentLoadingProgressBar.hide()
-            if (it.isSuccess)
-                adapter.venues = it.getOrThrow()
-            else
-                Toast.makeText(this, it.exceptionOrNull()?.message, Toast.LENGTH_SHORT).show()
+    private fun setupLiveDataObserver(adapter: VenueAdapter) {
+        // data in from model
+        viewModel.state.observe(this, Observer { event ->
+            when (event) {
+                LoadingEvent -> contentLoadingProgressBar.show()
+                is ContentEvent<*> -> {
+                    contentLoadingProgressBar.hide()
+                    adapter.venues = eventContent(event)
+                }
+                is ErrorEvent -> {
+                    contentLoadingProgressBar.hide()
+                    event.throwable?.let {
+                        Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         })
         // data out from click
         adapter.selectedVenue.observe(this, Observer<Venue> { onSelectedVenue(it) })

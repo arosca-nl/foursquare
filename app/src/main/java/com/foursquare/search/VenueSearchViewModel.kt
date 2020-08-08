@@ -1,35 +1,33 @@
 package com.foursquare.search
 
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.foursquare.lifecycle.*
 import com.foursquare.venue.data.Venue
 import com.foursquare.venue.data.VenueRepository
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class VenueSearchViewModel @ViewModelInject constructor(private val venueRepository: VenueRepository) :
     ViewModel() {
 
-    private val mutableVenues = MutableLiveData<VenuesResult>()
-    private var searchJob: Job? = null
+    private val mutableState = MutableLiveData<LiveDataEvent>()
 
-    val venues: LiveData<VenuesResult> = MediatorLiveData<VenuesResult>().apply {
-        addSource(mutableVenues) { if (it != null) value = it }
-    }
+    val state: LiveData<LiveDataEvent> = mutableState.nonNull()
 
     fun search(near: String?) {
-        searchJob?.cancel()
+        mutableState.value = LoadingEvent
 
         if (near.isNullOrEmpty())
-            mutableVenues.value = Result.success(emptyList())
-        else searchJob = viewModelScope.launch {
-            val result = runCatching { venueRepository.search(near) }
-            // hide cancel
-            if (result.exceptionOrNull() !is CancellationException)
-                mutableVenues.value = result
+            mutableState.value = ContentEvent(emptyList<Venue>())
+        else viewModelScope.launch {
+            try {
+                mutableState.value = ContentEvent(venueRepository.search(near))
+            } catch (e: Throwable) {
+                mutableState.value = ErrorEvent(e)
+            }
         }
     }
 }
-
-typealias VenuesResult = Result<List<Venue>>

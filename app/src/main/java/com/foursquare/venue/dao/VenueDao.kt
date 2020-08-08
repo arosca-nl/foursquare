@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
-interface VenuesDao {
+interface VenueDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertVenues(venues: List<VenueEntity>)

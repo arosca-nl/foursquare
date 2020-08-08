@@ -11,5 +11,4 @@ data class Venue(
 ) {
 
     val categoryName by lazy { categories.firstOrNull { it.primary }?.name }
-
 }
